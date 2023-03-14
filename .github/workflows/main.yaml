@@ -42,5 +42,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
       - run: cd architeture2
+      - run: ls
       - run: sam build      
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
