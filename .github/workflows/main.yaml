@@ -72,7 +72,7 @@ jobs:
       - run: terraform init
       - run: terraform plan
       - run: terraform apply -auto-approve
-      - run: terraform destroy
+      - run: terraform destroy -auto-approve
         if: ${{ failure() || cancelled() }}
 
   # integration_test:
