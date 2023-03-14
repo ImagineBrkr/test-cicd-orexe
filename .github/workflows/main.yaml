@@ -55,13 +55,7 @@ jobs:
         with:
           python-version: '3.9'
           cache: 'pip'
-        
-      # - name: Install dependencies
-      #   run: pip install -r ./lambda_function/requirements.txt  
 
-      # - uses: aws-actions/setup-sam@v2
-      #   with:
-      #     use-installer: true
       - uses: hashicorp/setup-terraform@v2
 
       - uses: aws-actions/configure-aws-credentials@v1
@@ -74,15 +68,18 @@ jobs:
       - run: terraform init
       - run: terraform plan
       - run: terraform apply -auto-approve
-      - run: terraform destroy -auto-approve
-        if: ${{ failure() || cancelled() }}
+
       - run: terraform output
       - run: terraform output -raw api_url
       - run: export api_url=$(terraform output -raw api_url)
       - run: echo $api_url
-      - run: echo api_url=$api_url >> $GITHUB_OUTPUT
+      - run: echo api_url=$(terraform output -raw api_url) >> $GITHUB_OUTPUT
         id: get_api_url
       - run: echo ${{ steps.get_api_url.outputs.api_url }}
+
+      - run: terraform destroy -auto-approve
+        # if: ${{ failure() || cancelled() }}
+
 
   integration_test:
     needs: [build_and_deploy]
