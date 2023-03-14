@@ -69,12 +69,12 @@ jobs:
       - run: terraform plan
       - run: terraform apply -auto-approve
 
-      - run: terraform output
-      - run: terraform output -raw api_url
-      - run: export api_url=$(terraform output -raw api_url)
-      - run: echo $api_url
-      - run: echo api_url=$(terraform output -raw api_url) >> $GITHUB_OUTPUT
-        id: get_api_url
+      - id: get_api_url
+        run: |
+        api_url=$(terraform output -raw api_url)
+        echo $api_url
+        echo api_url=$api_url >> $GITHUB_OUTPUT
+        
       - run: echo ${{ steps.get_api_url.outputs.api_url }}
 
       - run: terraform destroy -auto-approve
