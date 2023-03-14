@@ -67,8 +67,9 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-          
+
       - run: bash ../.github/scripts/py_build.sh $GITHUB_WORKSPACE/architeture2/lambda_function $GITHUB_WORKSPACE/architeture2/build hello_function.zip Function   
+      - run: terraform init
       - run: terraform plan
       - run: terraform apply -auto-approve
 
