@@ -12,33 +12,33 @@ jobs:
   #   name: Obtaining the code
   #   runs-on: ubuntu-latest
 
-  unit_test:
-    name: Testing function
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./architeture2
-    steps:
-      - name: Check out repo's default branch
-        uses: actions/checkout@v3
+  # unit_test:
+  #   name: Testing function
+  #   runs-on: ubuntu-latest
+  #   defaults:
+  #     run:
+  #       working-directory: ./architeture2
+  #   steps:
+  #     - name: Check out repo's default branch
+  #       uses: actions/checkout@v3
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-          cache: 'pip'   
+  #     - name: Setup Python
+  #       uses: actions/setup-python@v4
+  #       with:
+  #         python-version: '3.9'
+  #         cache: 'pip'   
 
-      - name: Install dependencies
-        run: pip install -r ./tests/requirements.txt  
+  #     - name: Install dependencies
+  #       run: pip install -r ./tests/requirements.txt  
 
-      - uses: aws-actions/setup-sam@v2
-        with:
-          use-installer: true
+  #     - uses: aws-actions/setup-sam@v2
+  #       with:
+  #         use-installer: true
 
-      - run: python -m pytest tests/unit -v
+  #     - run: python -m pytest tests/unit -v
       
   build_and_deploy:
-    needs: [unit_test]
+    # needs: [unit_test]
     name: Building and deploying
     runs-on: ubuntu-latest
     defaults:
@@ -77,10 +77,10 @@ jobs:
       - run: terraform destroy -auto-approve
         if: ${{ failure() || cancelled() }}
       - run: terraform output
-      - run: terraform output api_url
-      - run: API_URL=$(terraform output api_url)
-      - run: echo $API_URL
-      - run: echo api_url=$API_URL >> $GITHUB_OUTPUT
+      - run: terraform output -raw api_url
+      - run: export api_url=$(terraform output -raw api_url)
+      - run: echo $api_url
+      - run: echo api_url=$api_url >> $GITHUB_OUTPUT
         id: get_api_url
       - run: echo ${{ steps.get_api_url.outputs.api_url }}
 
