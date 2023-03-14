@@ -1,0 +1,45 @@
+name: Deploying lambda function
+run-name: Deploying lambda function
+
+on:
+  push:
+    branches:
+      - "main"
+  workflow_dispatch:
+
+env:
+  LAST_NAME: E.I.R.L
+
+jobs:
+  # code:
+  #   name: Obtaining the code
+  #   runs-on: ubuntu-latest
+
+  # test:
+
+  build:
+    name: Build package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo's default branch
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+        
+      - name: Install dependencies
+        run: pip install -r ./architeture2/lambda-function/requirements.txt  
+
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - run: sam build      
+      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
