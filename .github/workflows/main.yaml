@@ -71,9 +71,9 @@ jobs:
 
       - id: get_api_url
         run: |
-        api_url=$(terraform output -raw api_url)
-        echo $api_url
-        echo api_url=$api_url >> $GITHUB_OUTPUT
+          api_url=$(terraform output -raw api_url)
+          echo $api_url
+          echo api_url=$api_url >> $GITHUB_OUTPUT
         
       - run: echo ${{ steps.get_api_url.outputs.api_url }}
 
