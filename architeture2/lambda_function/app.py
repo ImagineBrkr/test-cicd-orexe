@@ -5,7 +5,7 @@ import os
 def lambda_handler(event, context):
     name = "World"
     if "DEFAULT_NAME" in os.environ:
-        name = os.environ("DEFAULT_NAME")
+        name = os.environ["DEFAULT_NAME"]
 
     return {
         "statusCode": 200,
