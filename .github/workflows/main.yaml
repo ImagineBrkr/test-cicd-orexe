@@ -20,6 +20,9 @@ jobs:
   build:
     name: Build package
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./architeture2
     steps:
       - name: Check out repo's default branch
         uses: actions/checkout@v3
@@ -31,7 +34,7 @@ jobs:
           cache: 'pip'
         
       - name: Install dependencies
-        run: pip install -r ./architeture2/lambda-function/requirements.txt  
+        run: pip install -r ./lambda-function/requirements.txt  
 
       - uses: aws-actions/setup-sam@v2
         with:
@@ -41,7 +44,5 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-      - run: cd architeture2
-      - run: ls
       - run: sam build      
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
