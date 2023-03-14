@@ -23,6 +23,12 @@ module "hello_function" {
   handler       = "lambda_function.lambda_handler"
   runtime       = "python3.9"
   lambda_role   = aws_iam_role.iam_for_lambda.arn
+  attach_cloudwatch_logs_policy = false
+  attach_dead_letter_policy     = false
+  attach_network_policy         = false
+  attach_tracing_policy         = false
+  attach_async_event_policy     = false
+
 }
 
 //IAM Role policy for lambda function
