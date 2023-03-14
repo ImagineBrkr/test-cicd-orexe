@@ -76,7 +76,9 @@ jobs:
       - run: terraform apply -auto-approve
       - run: terraform destroy -auto-approve
         if: ${{ failure() || cancelled() }}
-      - run: API_URL=$(terraform output -raw api_url)
+      - run: terraform output
+      - run: terraform output api_url
+      - run: API_URL=$(terraform output api_url)
       - run: echo $API_URL
       - run: echo api_url=$API_URL >> $GITHUB_OUTPUT
         id: get_api_url
