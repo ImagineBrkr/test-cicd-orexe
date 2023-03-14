@@ -2,6 +2,10 @@ provider "aws" {
   region      = "us-east-1"
 }
 
+variable "TF_VAR_default_name" {
+  type = string
+}
+
 resource "aws_lambda_function" "hello_function" {
     filename = "${local.building_path}/${local.lambda_code_filename}"
     handler = "app.lambda_handler"
@@ -9,6 +13,11 @@ resource "aws_lambda_function" "hello_function" {
     function_name = "hello_function"
     role = aws_iam_role.iam_for_lambda.arn
     timeout = 30
+    environment {
+      variables = {
+        DEFAULT_NAME = var.TF_VAR_default_name
+      }
+    }
 }
 
 //Creates lambda function

@@ -38,9 +38,11 @@ jobs:
       - run: python -m pytest tests/unit -v
       
   build_and_deploy:
-    # needs: [unit_test]
+    needs: [unit_test]
     name: Building and deploying
     runs-on: ubuntu-latest
+    env:
+      TF_VAR_default_name: Salvattore
     defaults:
       run:
         working-directory: ./architeture2
