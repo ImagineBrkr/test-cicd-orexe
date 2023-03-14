@@ -7,18 +7,38 @@ on:
       - "main"
   workflow_dispatch:
 
-env:
-  LAST_NAME: E.I.R.L
-
 jobs:
   # code:
   #   name: Obtaining the code
   #   runs-on: ubuntu-latest
 
-  # test:
+  unit_test:
+    name: Testing function
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./architeture2
+    steps:
+      - name: Check out repo's default branch
+        uses: actions/checkout@v3
 
-  build:
-    name: Build package
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'   
+
+      - name: Install dependencies
+        run: pip install -r ./tests/requirements.txt  
+
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+
+      - run: python -m pytest tests/unit -v
+      
+  build_and_deploy:
+    name: Building and deploying
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -34,7 +54,7 @@ jobs:
           cache: 'pip'
         
       - name: Install dependencies
-        run: pip install -r ./lambda-function/requirements.txt  
+        run: pip install -r ./lambda_function/requirements.txt  
 
       - uses: aws-actions/setup-sam@v2
         with:
@@ -46,3 +66,26 @@ jobs:
           aws-region: us-east-1
       - run: sam build      
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
+
+  integration_test:
+    name: Testing api
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./architeture2
+    steps:
+      - name: Check out repo's default branch
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'   
+
+      - name: Install dependencies
+        run: pip install -r ./tests/requirements.txt  
+
+      - run: python -m pytest tests/integration -v
+        env:
+          AWS_SAM_STACK_NAME: testing-gha
