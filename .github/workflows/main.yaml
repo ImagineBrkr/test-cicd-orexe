@@ -38,6 +38,7 @@ jobs:
       - run: python -m pytest tests/unit -v
       
   build_and_deploy:
+    needs: [unit_test]
     name: Building and deploying
     runs-on: ubuntu-latest
     defaults:
@@ -68,6 +69,7 @@ jobs:
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
 
   integration_test:
+    needs: [build_and_deploy]
     name: Testing api
     runs-on: ubuntu-latest
     defaults:
