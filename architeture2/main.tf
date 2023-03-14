@@ -18,7 +18,7 @@ module "hello_function" {
   create_role   = false 
   timeout       = 30
   create_package         = false
-  local_existing_package = "${local.building_path}/${local.lambda_code_filename}"
+  local_existing_package = "${locals.building_path}/${locals.lambda_code_filename}"
   function_name = "hello_function"
   handler       = "lambda_function.lambda_handler"
   runtime       = "python3.9"

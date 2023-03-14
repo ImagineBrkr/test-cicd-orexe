@@ -70,7 +70,7 @@ jobs:
 
       - run: bash ../.github/scripts/py_build.sh $GITHUB_WORKSPACE/architeture2/lambda_function $GITHUB_WORKSPACE/architeture2/build hello_function.zip Function   
       - run: ls
-      - run: cd build
+      - run: cd build | ls
       - run: ls
       # - run: terraform init
       # - run: terraform plan
