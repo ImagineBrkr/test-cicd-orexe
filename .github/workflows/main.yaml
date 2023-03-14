@@ -12,30 +12,30 @@ jobs:
   #   name: Obtaining the code
   #   runs-on: ubuntu-latest
 
-  # unit_test:
-  #   name: Testing function
-  #   runs-on: ubuntu-latest
-  #   defaults:
-  #     run:
-  #       working-directory: ./architeture2
-  #   steps:
-  #     - name: Check out repo's default branch
-  #       uses: actions/checkout@v3
+  unit_test:
+    name: Testing function
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./architeture2
+    steps:
+      - name: Check out repo's default branch
+        uses: actions/checkout@v3
 
-  #     - name: Setup Python
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: '3.9'
-  #         cache: 'pip'   
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'   
 
-  #     - name: Install dependencies
-  #       run: pip install -r ./tests/requirements.txt  
+      - name: Install dependencies
+        run: pip install -r ./tests/requirements.txt  
 
-  #     - uses: aws-actions/setup-sam@v2
-  #       with:
-  #         use-installer: true
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
 
-  #     - run: python -m pytest tests/unit -v
+      - run: python -m pytest tests/unit -v
       
   build_and_deploy:
     # needs: [unit_test]
@@ -44,6 +44,8 @@ jobs:
     defaults:
       run:
         working-directory: ./architeture2
+    outputs:
+      api_url: ${{ steps.get_api_url.outputs.api_url }}
     steps:
       - name: Check out repo's default branch
         uses: actions/checkout@v3
@@ -74,33 +76,38 @@ jobs:
       - run: terraform apply -auto-approve
       - run: terraform destroy -auto-approve
         if: ${{ failure() || cancelled() }}
+      - run: API_URL=$(terraform output -raw api_url)
+      - run: echo api_url=$API_URL >> $GITHUB_OUTPUT
+        id: get_api_url
 
-  # integration_test:
-  #   needs: [build_and_deploy]
-  #   name: Testing api
-  #   runs-on: ubuntu-latest
-  #   defaults:
-  #     run:
-  #       working-directory: ./architeture2
-  #   steps:
-  #     - name: Check out repo's default branch
-  #       uses: actions/checkout@v3
+  integration_test:
+    needs: [build_and_deploy]
+    name: Testing api
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./architeture2
+    env:
+      API_URL: ${{ needs.build_and_deploy.outputs.api_url }}
+    steps:
+      - name: Check out repo's default branch
+        uses: actions/checkout@v3
 
-  #     - name: Setup Python
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: '3.9'
-  #         cache: 'pip'   
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'   
 
-  #     - name: Install dependencies
-  #       run: pip install -r ./tests/requirements.txt  
+      - name: Install dependencies
+        run: pip install -r ./tests/requirements.txt  
 
-  #     - uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-region: us-east-1
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-  #     - run: python -m pytest tests/integration -v
-  #       env:
-  #         AWS_SAM_STACK_NAME: testing-gha
+      - run: python -m pytest tests/integration -v
+        env:
+          AWS_SAM_STACK_NAME: testing-gha

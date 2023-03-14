@@ -4,7 +4,7 @@ provider "aws" {
 
 resource "aws_lambda_function" "hello_function" {
     filename = "${local.building_path}/${local.lambda_code_filename}"
-    handler = "lambda_function.lambda_handler"
+    handler = "app.lambda_handler"
     runtime = "python3.9"
     function_name = "hello_function"
     role = aws_iam_role.iam_for_lambda.arn
