@@ -66,7 +66,7 @@ resource "aws_apigatewayv2_integration" "get_hello_function" {
 
   integration_uri    = module.hello_function.lambda_function_invoke_arn
   integration_type   = "AWS_PROXY"
-  integration_method = "GET"
+  integration_method = "POST"
 }
 
 //Route
