@@ -43,10 +43,10 @@ jobs:
       - run: terraform destroy --auto-approve
         if: ${{ failure() || cancelled() }}
       
-      # - run: |
-      #     api_url=$(terraform output -raw api_url)
-      #     echo $api_url
-      #     echo "api_url=$api_url" >> $GITHUB_OUTPUT
+      - run: |
+          api_url=$(terraform output -raw api_url)
+          echo $api_url
+          echo "api_url=$api_url" >> $GITHUB_OUTPUT
 
       - uses: actions/cache@v3
         name: Saving key
@@ -58,7 +58,7 @@ jobs:
             ${{ runner.os }}-${{ hashFiles('**/terraform.tfstate.backup') }}
 
   lb_test:
-    # needs: [build_and_deploy]
+    needs: [build_and_deploy]
     name: Testing load balancer
     runs-on: ubuntu-latest
     defaults:
@@ -136,6 +136,6 @@ jobs:
           aws-region: us-east-1
 
       - run: python -m pytest tests/auto_scale/test.py 
-      
+
       - run: terraform destroy --auto-approve
         if: ${{ failure() || cancelled() }}
