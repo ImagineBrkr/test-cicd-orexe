@@ -44,9 +44,10 @@ jobs:
         if: ${{ failure() || cancelled() }}
       
       - run: |
-          api_url=$(terraform output -raw api_url)
-          echo $api_url
-          echo "api_url=$api_url" >> $GITHUB_OUTPUT
+          lb_url=$(terraform output -raw lb_url)
+          echo $lb_url
+          echo "lb_url=$lb_url" >> $GITHUB_OUTPUT
+        id: get_lb_url
 
       - uses: actions/cache@v3
         name: Saving key
