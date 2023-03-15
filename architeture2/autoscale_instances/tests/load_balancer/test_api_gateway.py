@@ -4,12 +4,8 @@ import pytest
 import requests
 import time
 
-"""
-Make sure env variable AWS_SAM_STACK_NAME exists with the name of the stack we are going to test. 
-"""
 
-
-class TestApiGateway:
+class TestLoadBalancer:
 
     @pytest.fixture()
     def lb_url(self):
@@ -38,7 +34,7 @@ class TestApiGateway:
         # return api_outputs[0]["OutputValue"]  # Extract url from stack outputs
         return os.environ.get("LB_URL")
 
-    def test_api_gateway(self, lb_url):
+    def test_load_balancer(self, lb_url):
         """ Call the Load Balancer and assert the response (May take some time) """
         for i in range(10):
             response = requests.get(lb_url)

@@ -54,35 +54,35 @@ jobs:
           path: ./
           key: ${{ runner.os }}-${{ hashFiles('**/customKey.pem') }}
 
-  # lb_test:
-  #   needs: [build_and_deploy]
-  #   name: Testing load balancer
-  #   runs-on: ubuntu-latest
-  #   defaults:
-  #     run:
-  #       working-directory: ./architeture2/autoscale_instances
-  #   steps:
-  #     - name: Check out repo's default branch
-  #       uses: actions/checkout@v3
+  lb_test:
+    needs: [build_and_deploy]
+    name: Testing load balancer
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./architeture2/autoscale_instances
+    steps:
+      - name: Check out repo's default branch
+        uses: actions/checkout@v3
 
-  #     - name: Setup Python
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: '3.9'
-  #         cache: 'pip'   
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'   
 
-  #     - name: Install dependencies
-  #       run: pip install -r ./tests/requirements.txt  
+      - name: Install dependencies
+        run: pip install -r ./tests/requirements.txt  
 
-  #     - uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-region: us-east-1
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-  #     - run: python -m pytest tests/integration -v
-  #       env:
-  #         LB_URL: ${{ needs.build_and_deploy.outputs.lb_url }}
+      - run: python -m pytest tests/integration -v
+        env:
+          LB_URL: ${{ needs.build_and_deploy.outputs.lb_url }}
 
   test_stress:
     needs: [build_and_deploy]
@@ -102,5 +102,25 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/customKey.pem') }}
           restore-keys: |
             ${{ runner.os }}-
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'   
+
+      - name: Install dependencies
+        run: pip install -r ./tests/requirements.txt  
         
-      - run: cat customKey.pem
+      - run: mv customKey.pem tests/auto_scale
+      - run: |
+          cd tests/auto_scale
+          chmod 400 customKey.pem
+        
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - run: python -m pytest tests/auto_scale/test.py 

@@ -108,7 +108,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - run: python -m pytest tests/integration -v
+      - run: python -m pytest tests/load_balancer -v
         env:
           AWS_SAM_STACK_NAME: testing-gha
           API_URL: ${{ needs.build_and_deploy.outputs.api_url }}
