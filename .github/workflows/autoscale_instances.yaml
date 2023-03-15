@@ -1,0 +1,105 @@
+name: Deploying lambda function
+run-name: Deploying lambda function
+
+on:
+  push:
+    branches:
+      - "main"
+  workflow_dispatch:
+
+jobs:
+  # code:
+  #   name: Obtaining the code
+  #   runs-on: ubuntu-latest
+      
+  build_and_deploy:
+    needs: [unit_test]
+    name: Building and deploying
+    runs-on: ubuntu-latest
+    env:
+      TF_VAR_default_name: Salvattore
+    defaults:
+      run:
+        working-directory: ./architeture2/autoscale_instances
+    outputs:
+      lb_url: ${{ steps.get_lb_url.outputs.lb_url }}
+    steps:
+      - name: Check out repo's default branch
+        uses: actions/checkout@v3
+
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
+
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - run: |
+          terraform init
+          terraform plan
+          terraform apply --auto-approve
+      - run: terraform destroy --auto-approve
+        if: ${{ failure() || cancelled() }}
+      
+      # - run: |
+      #     api_url=$(terraform output -raw api_url)
+      #     echo $api_url
+      #     echo "api_url=$api_url" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Saving key
+        with:
+          path: ./
+          key: ${{ runner.os }}-${{ hashFiles('**/customKey.pem') }}
+
+  # lb_test:
+  #   needs: [build_and_deploy]
+  #   name: Testing load balancer
+  #   runs-on: ubuntu-latest
+  #   defaults:
+  #     run:
+  #       working-directory: ./architeture2/autoscale_instances
+  #   steps:
+  #     - name: Check out repo's default branch
+  #       uses: actions/checkout@v3
+
+  #     - name: Setup Python
+  #       uses: actions/setup-python@v4
+  #       with:
+  #         python-version: '3.9'
+  #         cache: 'pip'   
+
+  #     - name: Install dependencies
+  #       run: pip install -r ./tests/requirements.txt  
+
+  #     - uses: aws-actions/configure-aws-credentials@v1
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-region: us-east-1
+
+  #     - run: python -m pytest tests/integration -v
+  #       env:
+  #         LB_URL: ${{ needs.build_and_deploy.outputs.lb_url }}
+
+  test_stress:
+    needs: [build_and_deploy]
+    name: Testing auto scaler
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./architeture2/autoscale_instances
+    steps:
+      - name: Check out repo's default branch
+        uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        name: Restoring key
+        with:
+          path: ./
+          key: ${{ runner.os }}-${{ hashFiles('**/customKey.pem') }}
+          restore-keys: |
+            ${{ runner.os }}-

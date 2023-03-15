@@ -2,9 +2,9 @@ name: Deploying lambda function
 run-name: Deploying lambda function
 
 on:
-  push:
-    branches:
-      - "main"
+  # push:
+  #   branches:
+  #     - "main"
   workflow_dispatch:
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./architeture2
+        working-directory: ./architeture2/add_lambda
     steps:
       - name: Check out repo's default branch
         uses: actions/checkout@v3
@@ -45,7 +45,7 @@ jobs:
       TF_VAR_default_name: Salvattore
     defaults:
       run:
-        working-directory: ./architeture2
+        working-directory: ./architeture2/add_lambda
     outputs:
       api_url: ${{ steps.get_api_url.outputs.api_url }}
     steps:
@@ -68,7 +68,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - run: bash ../.github/scripts/py_build.sh $GITHUB_WORKSPACE/architeture2/lambda_function $GITHUB_WORKSPACE/architeture2/build hello_function.zip Function   
+      - run: bash ../.github/scripts/py_build.sh $GITHUB_WORKSPACE/architeture2/add_lambda/lambda_function $GITHUB_WORKSPACE/architeture2/add_lambda/build hello_function.zip Function   
       - run: terraform init
       - run: terraform plan -var="TF_VAR_default_name=$TF_VAR_default_name"
       - run: terraform apply -auto-approve -var="TF_VAR_default_name=$TF_VAR_default_name"
@@ -88,7 +88,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./architeture2
+        working-directory: ./architeture2/add_lambda
     steps:
       - name: Check out repo's default branch
         uses: actions/checkout@v3
