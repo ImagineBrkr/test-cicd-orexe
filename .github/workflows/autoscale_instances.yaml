@@ -1,5 +1,5 @@
-name: Deploying lambda function
-run-name: Deploying lambda function
+name: Auto scaling instances
+run-name: Auto scaling instances
 
 on:
   push:
@@ -102,3 +102,5 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/customKey.pem') }}
           restore-keys: |
             ${{ runner.os }}-
+        
+      - run: cat customKey.pem
