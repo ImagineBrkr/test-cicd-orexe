@@ -135,7 +135,6 @@ jobs:
       - run: pip install boto3
       - run: mv customKey.pem tests/auto_scale
       - run: |
-          cd tests/auto_scale
           chmod 400 customKey.pem
         
       - uses: aws-actions/configure-aws-credentials@v1
