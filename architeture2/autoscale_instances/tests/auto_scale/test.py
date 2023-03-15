@@ -58,7 +58,9 @@ def test_auto_scale():
             num_instances = len(auto_scaling_instances)           
 
         for i in auto_scaling_instances:
-            subprocess.call(getInstanceConnect(i) + ' \"sudo stress --cpu 1500 --timeout 180 \"', shell = True)
+            result = subprocess.check_output(getInstanceConnect(i) + ' \"sudo stress --cpu 1500 --timeout 180 \"', shell = True)
+            if "Permission denied" in result:
+                raise Exception("Error key")
 
         time.sleep(60)
         for i in range(12):
@@ -95,6 +97,6 @@ def test_ansible():
             auto_scaling_instances = get_auto_scaling_instances()
             num_instances = len(auto_scaling_instances)   
         try:
-            result = subprocess.check_output(getInstanceConnect(auto_scaling_instances[0]) + ' \"ansible --version\"')
+            result = subprocess.check_output(getInstanceConnect(auto_scaling_instances[0]) + ' \"ansible --version\"', shell = True)
         except CalledProcessError:
             raise Exception("Ansible not found")
