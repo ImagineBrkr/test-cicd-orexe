@@ -132,7 +132,7 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r ./tests/requirements.txt  
-        
+      - run: pip install boto3
       - run: mv customKey.pem tests/auto_scale
       - run: |
           cd tests/auto_scale
