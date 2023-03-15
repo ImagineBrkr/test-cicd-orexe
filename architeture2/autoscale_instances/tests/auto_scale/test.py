@@ -38,7 +38,7 @@ def test_auto_scale():
             response = ec2_client.describe_instances()
             for reservation in response['Reservations']:
                 for instance in reservation['Instances']:
-                    if instance['State']['Name'] == 'running':
+                    if instance['State']['Name'] == 'running' or instance['State']['Name'] == 'pending':
                         for tag in instance['Tags']:
                             if tag['Key'] == 'aws:autoscaling:groupName' and tag['Value'] == 'autoscale_group':
                                 instances.append(instance['InstanceId'])
@@ -61,11 +61,12 @@ def test_auto_scale():
             subprocess.call(getInstanceConnect(i) + ' \"sudo stress --cpu 1500 --timeout 180 \"', shell = True)
 
         time.sleep(60)
-        for i in range(10):
-            auto_scaling_instances = get_auto_scaling_instances()
+        for i in range(12):
+            
             if num_instances < len(auto_scaling_instances):
                 break
             time.sleep(30)
+            auto_scaling_instances = get_auto_scaling_instances()
 
         assert num_instances < len(auto_scaling_instances)
 
