@@ -188,7 +188,7 @@ resource "aws_autoscaling_group" "autoscale_group" {
 resource "aws_autoscaling_policy" "autoscale_policy" {
   name                   = "autoscale_policy"
   policy_type            = "TargetTrackingScaling"
-  estimated_instance_warmup = 100
+  estimated_instance_warmup = 10
   target_tracking_configuration  {
     predefined_metric_specification {
       predefined_metric_type = "ASGAverageCPUUtilization"

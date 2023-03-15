@@ -142,8 +142,8 @@ jobs:
           aws-region: us-east-1
       - run: |
           ls -lha
-          chmod 400 ./customKey.pem
-          chmod 400 customKey.pem
+          sudo chmod 600 ./customKey.pem
+          sudo chmod 600 customKey.pem
           ls -lha
           python -m pytest tests/auto_scale/test.py
 

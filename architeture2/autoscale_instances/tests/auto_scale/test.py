@@ -26,7 +26,7 @@ def getNameConnect(InstanceId):
 
 def getInstanceConnect(InstanceId):
     instance = getInstanceDetails(InstanceId)
-    connect = "ssh -o StrictHostKeyChecking=no -i \"" +os.getcwd()+ "/%s.pem\" %s" % (instance['KeyName'], getNameConnect(InstanceId))
+    connect = "ssh -o StrictHostKeyChecking=no -i \"%s.pem\" %s" % (instance['KeyName'], getNameConnect(InstanceId))
     return connect
 
 def test_auto_scale():
@@ -62,8 +62,8 @@ def test_auto_scale():
             if "Permission denied" in result:
                 raise Exception("Error key")
 
-        time.sleep(60)
-        for i in range(12):
+        time.sleep(30)
+        for i in range(8):
             
             if num_instances < len(auto_scaling_instances):
                 break
