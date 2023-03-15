@@ -147,7 +147,7 @@ resource "aws_launch_template" "aws_autoscale_conf" {
   instance_type = "t2.micro"
 # Defining the Key that will be used to access the AWS EC2 instance
   key_name = "customKey"
-  user_data = filebase64("${path.module}/install_apache.sh")
+  user_data = filebase64("${path.module}/install_user_data.sh")
   vpc_security_group_ids = toset([aws_security_group.security_group_ec2.id])
 
   depends_on = [
