@@ -52,10 +52,13 @@ jobs:
         name: Saving key
         with:
           path: ./
-          key: ${{ runner.os }}-${{ hashFiles('**/customKey.pem') }}
+          key: |
+            ${{ runner.os }}-${{ hashFiles('**/customKey.pem') }}
+            ${{ runner.os }}-${{ hashFiles('**/terraform.tfstate') }}
+            ${{ runner.os }}-${{ hashFiles('**/terraform.tfstate.backup') }}
 
   lb_test:
-    needs: [build_and_deploy]
+    # needs: [build_and_deploy]
     name: Testing load balancer
     runs-on: ubuntu-latest
     defaults:
@@ -70,6 +73,13 @@ jobs:
         with:
           python-version: '3.9'
           cache: 'pip'   
+      - uses: actions/cache@v3
+        name: Restoring key
+        with:
+          path: ./
+          key: ${{ runner.os }}-${{ hashFiles('**/customKey.pem') }}
+          restore-keys: |
+            ${{ runner.os }}-
 
       - name: Install dependencies
         run: pip install -r ./tests/requirements.txt  
@@ -80,9 +90,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - run: python -m pytest tests/integration -v
+      - run: python -m pytest tests/load_balancer -v
         env:
           LB_URL: ${{ needs.build_and_deploy.outputs.lb_url }}
+      - run: terraform destroy --auto-approve
+        if: ${{ failure() || cancelled() }}
 
   test_stress:
     needs: [build_and_deploy]
@@ -124,3 +136,6 @@ jobs:
           aws-region: us-east-1
 
       - run: python -m pytest tests/auto_scale/test.py 
+      
+      - run: terraform destroy --auto-approve
+        if: ${{ failure() || cancelled() }}
