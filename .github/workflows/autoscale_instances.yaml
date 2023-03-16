@@ -118,7 +118,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Restoring key
-        run: cat ${{ needs.jobs.outputs.key }} > customKey.pem
+        run: echo ${{ needs.jobs.outputs.key }} > customKey.pem
 
       # - uses: actions/cache@v3
       #   name: Restoring key
