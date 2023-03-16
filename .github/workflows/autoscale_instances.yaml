@@ -124,7 +124,7 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: my-artifact
+          name: key_and_tf
           path: architeture2/autoscale_instances
         
       # - uses: aws-actions/configure-aws-credentials@v1
