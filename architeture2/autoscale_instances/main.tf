@@ -86,7 +86,7 @@ resource "tls_private_key" "rsa" {
   rsa_bits          = 4096
 }
 
-resource "aws_key_pair" "customKey" {
+resource "aws_key_pair" "customkey" {
   key_name          = "customkey"
   public_key        = tls_private_key.rsa.public_key_openssh
 }
@@ -146,12 +146,12 @@ resource "aws_launch_template" "aws_autoscale_conf" {
 # Defining the instance type of the AWS EC2 instance
   instance_type = "t2.micro"
 # Defining the Key that will be used to access the AWS EC2 instance
-  key_name = "customKey"
+  key_name = "customkey"
   user_data = filebase64("${path.module}/install_user_data.sh")
   vpc_security_group_ids = toset([aws_security_group.security_group_ec2.id])
 
   depends_on = [
-    aws_key_pair.customKey
+    aws_key_pair.customkey
   ]
 
 }
