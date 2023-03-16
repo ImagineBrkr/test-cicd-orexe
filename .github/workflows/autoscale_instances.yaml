@@ -2,9 +2,9 @@ name: Auto scaling instances
 run-name: Auto scaling instances
 
 on:
-  # push:
-  #   branches:
-  #     - "main"
+  push:
+    branches:
+      - "main"
   workflow_dispatch:
 
 jobs:
@@ -22,6 +22,7 @@ jobs:
         working-directory: ./architeture2/autoscale_instances
     outputs:
       lb_url: ${{ steps.get_lb_url.outputs.lb_url }}
+      key: ${{ steps.get_key.outputs.key }}
     steps:
       - name: Check out repo's default branch
         uses: actions/checkout@v3
@@ -48,14 +49,17 @@ jobs:
           echo "lb_url=$lb_url" >> $GITHUB_OUTPUT
         id: get_lb_url
 
-      - uses: actions/cache@v3
-        name: Saving key
-        with:
-          path: ./
-          key: |
-            ${{ runner.os }}-${{ hashFiles('**/customKey.pem') }}
-            ${{ runner.os }}-${{ hashFiles('**/terraform.tfstate') }}
-            ${{ runner.os }}-${{ hashFiles('**/terraform.tfstate.backup') }}
+      - run: echo "key=$(cat customKey.pem)" >> $GITHUB_OUTPUT
+        id: get_key
+
+      # - uses: actions/cache@v3
+      #   name: Saving key
+      #   with:
+      #     path: ./
+      #     key: |
+      #       ${{ runner.os }}-${{ hashFiles('**/customKey.pem') }}
+      #       ${{ runner.os }}-${{ hashFiles('**/terraform.tfstate') }}
+      #       ${{ runner.os }}-${{ hashFiles('**/terraform.tfstate.backup') }}
 
       - run: terraform destroy --auto-approve
         if: ${{ failure() || cancelled() }}
@@ -76,16 +80,16 @@ jobs:
         with:
           python-version: '3.9'
           cache: 'pip'   
-      - uses: actions/cache@v3
-        name: Restoring key
-        with:
-          path: ./
-          key: |
-            ${{ runner.os }}-${{ hashFiles('**/customKey.pem') }}
-            ${{ runner.os }}-${{ hashFiles('**/terraform.tfstate') }}
-            ${{ runner.os }}-${{ hashFiles('**/terraform.tfstate.backup') }}
-          restore-keys: |
-            ${{ runner.os }}-
+      # - uses: actions/cache@v3
+      #   name: Restoring key
+      #   with:
+      #     path: ./
+      #     key: |
+      #       ${{ runner.os }}-${{ hashFiles('**/customKey.pem') }}
+      #       ${{ runner.os }}-${{ hashFiles('**/terraform.tfstate') }}
+      #       ${{ runner.os }}-${{ hashFiles('**/terraform.tfstate.backup') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-
 
       - name: Install dependencies
         run: pip install -r ./tests/requirements.txt  
@@ -113,16 +117,19 @@ jobs:
       - name: Check out repo's default branch
         uses: actions/checkout@v3
 
-      - uses: actions/cache@v3
-        name: Restoring key
-        with:
-          path: ./
-          key: |
-            ${{ runner.os }}-${{ hashFiles('**/customKey.pem') }}
-            ${{ runner.os }}-${{ hashFiles('**/terraform.tfstate') }}
-            ${{ runner.os }}-${{ hashFiles('**/terraform.tfstate.backup') }}
-          restore-keys: |
-            ${{ runner.os }}-
+      - name: Restoring key
+        run: cat ${{ needs.jobs.outputs.key }} > customKey.pem
+
+      # - uses: actions/cache@v3
+      #   name: Restoring key
+      #   with:
+      #     path: ./
+      #     key: |
+      #       ${{ runner.os }}-${{ hashFiles('**/customKey.pem') }}
+      #       ${{ runner.os }}-${{ hashFiles('**/terraform.tfstate') }}
+      #       ${{ runner.os }}-${{ hashFiles('**/terraform.tfstate.backup') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -143,8 +150,8 @@ jobs:
       - run: |
           ls -lha
           cat customKey.pem
-          sudo chmod 600 ./customKey.pem
-          sudo chmod 600 customKey.pem
+          sudo chmod 400 ./customKey.pem
+          sudo chmod 400 customKey.pem
           ls -lha
           python -m pytest tests/auto_scale/test.py
 

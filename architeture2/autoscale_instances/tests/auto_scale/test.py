@@ -29,7 +29,7 @@ def getInstanceConnect(InstanceId):
     connect = "ssh -o StrictHostKeyChecking=no -i \"%s.pem\" %s" % (instance['KeyName'], getNameConnect(InstanceId))
     return connect
 
-def scale():
+def test_scale():
         
         ec2_client = boto3.client('ec2')
         auto_scaling_instances = []
@@ -72,7 +72,7 @@ def scale():
 
         assert num_instances < len(auto_scaling_instances)
 
-def ansible():
+def test_ansible():
         ec2_client = boto3.client('ec2')
         auto_scaling_instances = []
         def get_auto_scaling_instances():
@@ -100,13 +100,3 @@ def ansible():
             result = subprocess.check_output(getInstanceConnect(auto_scaling_instances[0]) + ' \"ansible --version\"', shell = True)
         except CalledProcessError:
             raise Exception("Ansible not found")
-
-def test_main():
-    result = subprocess.check_output('ls', shell=True)
-    print(result)
-    result = subprocess.check_output('cat TEST_KEY.pem', shell=True)
-    print(result)
-    # f = open("customKey.pem", 'r')
-    # print(f.read())
-
-test_main()
