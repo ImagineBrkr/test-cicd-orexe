@@ -104,7 +104,7 @@ def ansible():
 def test_main():
     result = subprocess.check_output('ls', shell=True)
     print(result)
-    result = subprocess.check_output('cat customKey.pem', shell=True)
+    result = subprocess.check_output('cat TEST_KEY.pem', shell=True)
+    print(result)
     # f = open("customKey.pem", 'r')
     # print(f.read())
-
