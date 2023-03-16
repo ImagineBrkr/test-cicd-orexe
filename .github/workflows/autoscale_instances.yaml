@@ -36,8 +36,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      - uses: actions/download-artifact@v3
+        with:
+          name: tfstate
+          path: architeture2/autoscale_instances
+      
+      - run: terraform init
+      - run: terraform destroy --auto-approve
       - run: |
-          terraform init
           terraform plan
           terraform apply --auto-approve
 
@@ -49,12 +55,15 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: key_and_tf
-          path: |
-            architeture2/autoscale_instances/customkey.pem
-            architeture2/autoscale_instances/terraform.tfstate
-            architeture2/autoscale_instances/terraform.tfstate.backup
+          name: key
+          path: architeture2/autoscale_instances/customkey.pem
           if-no-files-found: error
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: tfstate
+          path: architeture2/autoscale_instances/terraform.tfstate
+          if-no-files-found: error           
 
       - run: |
           sleep 5s
@@ -80,7 +89,7 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: key_and_tf
+          name: tfstate
           path: architeture2/autoscale_instances
 
       - name: Install dependencies
@@ -96,7 +105,9 @@ jobs:
         env:
           LB_URL: ${{ needs.build_and_deploy.outputs.lb_url }}
 
-      - run: terraform destroy --auto-approve
+      - run: |
+          terraform init
+          terraform destroy --auto-approve
         if: ${{ failure() || cancelled() }}
 
   test_stress:
@@ -121,7 +132,12 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: key_and_tf
+          name: key
+          path: architeture2/autoscale_instances
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: tfstate
           path: architeture2/autoscale_instances
         
       - uses: aws-actions/configure-aws-credentials@v1
@@ -137,5 +153,7 @@ jobs:
           ls -lha
           python -m pytest tests/auto_scale/test.py          
 
-      - run: terraform destroy --auto-approve      
+      - run: |
+          terraform init
+          terraform destroy --auto-approve      
         if: ${{ failure() || cancelled() }}

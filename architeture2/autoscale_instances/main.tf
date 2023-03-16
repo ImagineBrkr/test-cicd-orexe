@@ -87,11 +87,11 @@ resource "tls_private_key" "rsa" {
 }
 
 resource "aws_key_pair" "customKey" {
-  key_name          = "customKey"
+  key_name          = "customkey"
   public_key        = tls_private_key.rsa.public_key_openssh
 }
 resource "local_file" "customkeypair" {
-  filename          = "customKey.pem"
+  filename          = "customkey.pem"
   content           = tls_private_key.rsa.private_key_pem
   file_permission   = "0400"
 }
