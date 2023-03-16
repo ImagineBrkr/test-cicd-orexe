@@ -55,7 +55,7 @@ jobs:
         with:
           name: key_and_tf
           path: |
-            customkey.pem
+            ./customkey.pem
           if-no-files-found: error
 
       - run: terraform destroy --auto-approve
