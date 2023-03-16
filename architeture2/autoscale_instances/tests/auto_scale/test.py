@@ -39,9 +39,10 @@ def test_scale():
             for reservation in response['Reservations']:
                 for instance in reservation['Instances']:
                     if instance['State']['Name'] == 'running' or instance['State']['Name'] == 'pending':
-                        for tag in instance['Tags']:
-                            if tag['Key'] == 'aws:autoscaling:groupName' and tag['Value'] == 'autoscale_group':
-                                instances.append(instance['InstanceId'])
+                        if 'Tags' in instance:
+                            for tag in instance['Tags']:
+                                if tag['Key'] == 'aws:autoscaling:groupName' and tag['Value'] == 'autoscale_group':
+                                    instances.append(instance['InstanceId'])
                                 
             return instances
             
@@ -81,9 +82,10 @@ def test_ansible():
             for reservation in response['Reservations']:
                 for instance in reservation['Instances']:
                     if instance['State']['Name'] == 'running':
-                        for tag in instance['Tags']:
-                            if tag['Key'] == 'aws:autoscaling:groupName' and tag['Value'] == 'autoscale_group':
-                                instances.append(instance['InstanceId'])
+                        if 'Tags' in instance:
+                            for tag in instance['Tags']:
+                                if tag['Key'] == 'aws:autoscaling:groupName' and tag['Value'] == 'autoscale_group':
+                                    instances.append(instance['InstanceId'])
             return instances
 
         auto_scaling_instances = get_auto_scaling_instances()
