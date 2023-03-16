@@ -48,15 +48,14 @@ jobs:
       #     echo "lb_url=$lb_url" >> $GITHUB_OUTPUT
       #   id: get_lb_url
 
-      - run: echo 'wasd' > customKey.pem
-
+      - run: |
+          echo 'wasd' > customKey.pem
+          ls
       - uses: actions/upload-artifact@v3
         with:
           name: key_and_tf
           path: |
             customKey.pem
-            terraform.tfstate
-            terraform.tfstate.backup
 
       - run: terraform destroy --auto-approve
         if: ${{ failure() || cancelled() }}
