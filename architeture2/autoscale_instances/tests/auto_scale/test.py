@@ -9,7 +9,6 @@ from datetime import datetime,timedelta, timezone
 from subprocess import CalledProcessError
 import subprocess
 
-ec2_client = boto3.client('ec2')
 
 def getInstanceDetails(InstanceId):
     response = ec2_client.describe_instances()
@@ -102,6 +101,9 @@ def ansible():
             raise Exception("Ansible not found")
 
 def test_main():
-    f = open("customKey.pem", 'r')
-    print(f.read())
+    result = subprocess.check_output('ls', shell=True)
+    print(result)
+    result = subprocess.check_output('cat customKey.pem', shell=True)
+    # f = open("customKey.pem", 'r')
+    # print(f.read())
 
