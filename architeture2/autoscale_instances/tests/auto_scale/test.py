@@ -108,3 +108,5 @@ def test_main():
     print(result)
     # f = open("customKey.pem", 'r')
     # print(f.read())
+
+test_main()

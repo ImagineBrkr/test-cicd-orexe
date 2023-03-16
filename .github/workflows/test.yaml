@@ -149,7 +149,7 @@ jobs:
           sudo chmod 400 TEST_KEY.pem
           ls -lha
           cat ./tests/auto_scale/test.py
-          python -m pytest tests/auto_scale/test.py
+          python tests/auto_scale/test.py
 
       # - run: terraform destroy --auto-approve
       #   if: ${{ failure() || cancelled() }}
