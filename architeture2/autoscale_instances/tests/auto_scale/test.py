@@ -11,6 +11,7 @@ import subprocess
 
 
 def getInstanceDetails(InstanceId):
+    ec2_client = boto3.client('ec2')
     response = ec2_client.describe_instances()
     instances = response['Reservations']
     for i in instances:
