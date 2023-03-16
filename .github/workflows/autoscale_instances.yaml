@@ -20,8 +20,8 @@ jobs:
     defaults:
       run:
         working-directory: ./architeture2/autoscale_instances
-    # outputs:
-    #   lb_url: ${{ steps.get_lb_url.outputs.lb_url }}
+    outputs:
+      lb_url: ${{ steps.get_lb_url.outputs.lb_url }}
     steps:
       - name: Check out repo's default branch
         uses: actions/checkout@v3
@@ -30,34 +30,30 @@ jobs:
         with:
           terraform_wrapper: false
 
-      # - uses: aws-actions/configure-aws-credentials@v1
-      #   with:
-      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     aws-region: us-east-1
-
-      # - run: |
-      #     terraform init
-      #     terraform plan
-      #     terraform apply --auto-approve
-
-      
-      # - run: |
-      #     lb_url=$(terraform output -raw lb_url)
-      #     echo $lb_url
-      #     echo "lb_url=$lb_url" >> $GITHUB_OUTPUT
-      #   id: get_lb_url
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
       - run: |
-          echo wasd > customkey.pem
-          cat customkey.pem
+          terraform init
+          terraform plan
+          terraform apply --auto-approve
+
+      - run: |
+          lb_url=$(terraform output -raw lb_url)
+          echo $lb_url
+          echo "lb_url=$lb_url" >> $GITHUB_OUTPUT
+        id: get_lb_url
+
       - uses: actions/upload-artifact@v3
         with:
           name: key_and_tf
           path: |
             architeture2/autoscale_instances/customkey.pem
-
-
+            architeture2/autoscale_instances/terraform.tfstate
+            architeture2/autoscale_instances/terraform.tfstate.backup
           if-no-files-found: error
 
       - run: |
@@ -65,41 +61,43 @@ jobs:
           terraform destroy --auto-approve
         if: ${{ failure() || cancelled() }}
 
-  # lb_test:
-  #   needs: [build_and_deploy]
-  #   name: Testing load balancer
-  #   runs-on: ubuntu-latest
-  #   defaults:
-  #     run:
-  #       working-directory: ./architeture2/autoscale_instances
-  #   steps:
-  #     - name: Check out repo's default branch
-  #       uses: actions/checkout@v3
+  lb_test:
+    needs: [build_and_deploy]
+    name: Testing load balancer
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./architeture2/autoscale_instances
+    steps:
+      - name: Check out repo's default branch
+        uses: actions/checkout@v3
 
-  #     - name: Setup Python
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: '3.9'
-  #         cache: 'pip'   
-      # - uses: actions/download-artifact@v3
-      #   with:
-      #     name: key_and_tf
-      #     path: architeture2/autoscale_instances
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'   
 
-  #     - name: Install dependencies
-  #       run: pip install -r ./tests/requirements.txt  
+      - uses: actions/download-artifact@v3
+        with:
+          name: key_and_tf
+          path: architeture2/autoscale_instances
 
-  #     - uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-region: us-east-1
+      - name: Install dependencies
+        run: pip install -r ./tests/requirements.txt  
 
-  #     - run: python -m pytest tests/load_balancer -v
-  #       env:
-  #         LB_URL: ${{ needs.build_and_deploy.outputs.lb_url }}
-  #     - run: terraform destroy --auto-approve
-  #       if: ${{ failure() || cancelled() }}
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - run: python -m pytest tests/load_balancer -v
+        env:
+          LB_URL: ${{ needs.build_and_deploy.outputs.lb_url }}
+
+      - run: terraform destroy --auto-approve
+        if: ${{ failure() || cancelled() }}
 
   test_stress:
     needs: [build_and_deploy]
@@ -112,34 +110,32 @@ jobs:
       - name: Check out repo's default branch
         uses: actions/checkout@v3
 
-      # - name: Setup Python
-      #   uses: actions/setup-python@v4
-      #   with:
-      #     python-version: '3.9'
-      #     cache: 'pip'   
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'   
 
-      # - name: Install dependencies
-      #   run: pip install -r ./tests/requirements.txt  
-      # - run: pip install boto3
+      - name: Install dependencies
+        run: pip install -r ./tests/requirements.txt  
 
       - uses: actions/download-artifact@v3
         with:
           name: key_and_tf
           path: architeture2/autoscale_instances
         
-      # - uses: aws-actions/configure-aws-credentials@v1
-      #   with:
-      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     aws-region: us-east-1
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
       - run: |
           ls -lha
           cat customkey.pem
-          sudo chmod 400 ./customkey.pem
           sudo chmod 400 customkey.pem
           ls -lha
-          
+          python -m pytest tests/auto_scale/test.py          
 
-      # - run: terraform destroy --auto-approve
-      # python -m pytest tests/auto_scale/test.py
-      #   if: ${{ failure() || cancelled() }}
+      - run: terraform destroy --auto-approve      
+        if: ${{ failure() || cancelled() }}
