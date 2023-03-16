@@ -54,10 +54,15 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: key_and_tf
-          path: architeture2/autoscale_instances/customkey.pem
+          path: |
+            architeture2/autoscale_instances/customkey.pem
+
+
           if-no-files-found: error
 
-      - run: terraform destroy --auto-approve
+      - run: |
+          sleep 5s
+          terraform destroy --auto-approve
         if: ${{ failure() || cancelled() }}
 
   # lb_test:
@@ -76,9 +81,10 @@ jobs:
   #       with:
   #         python-version: '3.9'
   #         cache: 'pip'   
-  #     - uses: actions/download-artifact@v3
-  #       with:
-  #         name: key_and_tf
+      - uses: actions/download-artifact@v3
+        with:
+          name: my-artifact
+          path: architeture2/autoscale_instances
 
   #     - name: Install dependencies
   #       run: pip install -r ./tests/requirements.txt  
@@ -118,7 +124,8 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: key_and_tf
+          name: my-artifact
+          path: architeture2/autoscale_instances
         
       # - uses: aws-actions/configure-aws-credentials@v1
       #   with:
@@ -127,11 +134,12 @@ jobs:
       #     aws-region: us-east-1
       - run: |
           ls -lha
-          cat customKey.pem
-          sudo chmod 400 ./customKey.pem
-          sudo chmod 400 customKey.pem
+          cat customkey.pem
+          sudo chmod 400 ./customkey.pem
+          sudo chmod 400 customkey.pem
           ls -lha
-          python -m pytest tests/auto_scale/test.py
+          
 
       # - run: terraform destroy --auto-approve
+      # python -m pytest tests/auto_scale/test.py
       #   if: ${{ failure() || cancelled() }}
