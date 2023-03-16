@@ -49,13 +49,12 @@ jobs:
       #   id: get_lb_url
 
       - run: |
-          echo 'wasd' > customkey.pem
-          ls
+          echo wasd > customkey.pem
+          cat customkey.pem
       - uses: actions/upload-artifact@v3
         with:
           name: key_and_tf
-          path: |
-            ./customkey.pem
+          path: customkey.pem
           if-no-files-found: error
 
       - run: terraform destroy --auto-approve
