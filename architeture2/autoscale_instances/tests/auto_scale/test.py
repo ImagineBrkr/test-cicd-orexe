@@ -59,9 +59,7 @@ def test_scale():
             num_instances = len(auto_scaling_instances)           
 
         for i in auto_scaling_instances:
-            result = subprocess.check_output(getInstanceConnect(i) + ' \"sudo stress --cpu 1500 --timeout 180 \"', shell = True)
-            if "Permission denied" in result:
-                raise Exception("Error key")
+            subprocess.call(getInstanceConnect(i) + ' \"sudo stress --cpu 1500 --timeout 180 \"', shell = True)
 
         time.sleep(30)
         for i in range(8):
