@@ -36,14 +36,8 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - uses: actions/download-artifact@v3
-        with:
-          name: tfstate
-          path: architeture2/autoscale_instances
-      
-      - run: terraform init
-      - run: terraform destroy --auto-approve
       - run: |
+          terraform init
           terraform plan
           terraform apply --auto-approve
 
