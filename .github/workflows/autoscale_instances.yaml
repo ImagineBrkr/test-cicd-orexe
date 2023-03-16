@@ -54,7 +54,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: key_and_tf
-          path: customkey.pem
+          path: /architeture2/autoscale_instances/customkey.pem
           if-no-files-found: error
 
       - run: terraform destroy --auto-approve
