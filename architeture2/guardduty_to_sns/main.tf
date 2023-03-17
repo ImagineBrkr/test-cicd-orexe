@@ -95,7 +95,7 @@ resource "aws_cloudwatch_event_rule" "mock_guardduty_data" {
   name        = "mock_guardduty_data"
   description = "Sending mock GuardDuty data"
 
-  schedule_expression = "rate(2 minutes)"
+  schedule_expression = "rate(15 minutes)"
   #event_bus_name = default
   is_enabled = true
 }
