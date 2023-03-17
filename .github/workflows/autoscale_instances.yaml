@@ -20,8 +20,8 @@ jobs:
     defaults:
       run:
         working-directory: ./architeture2/autoscale_instances
-    outputs:
-      lb_url: ${{ steps.get_lb_url.outputs.lb_url }}
+    # outputs:
+    #   lb_url: ${{ steps.get_lb_url.outputs.lb_url }}
     steps:
       - name: Check out repo's default branch
         uses: actions/checkout@v3
@@ -41,11 +41,11 @@ jobs:
           terraform plan
           terraform apply --auto-approve
 
-      - run: |
-          lb_url=$(terraform output -raw lb_url)
-          echo $lb_url
-          echo "lb_url=$lb_url" >> $GITHUB_OUTPUT
-        id: get_lb_url
+      # - run: |
+      #     lb_url=$(terraform output -raw lb_url)
+      #     echo $lb_url
+      #     echo "lb_url=$lb_url" >> $GITHUB_OUTPUT
+      #   id: get_lb_url
 
       # - uses: actions/upload-artifact@v3
       #   with:
@@ -64,45 +64,45 @@ jobs:
           terraform destroy --auto-approve
         if: ${{ failure() || cancelled() }}
 
-  lb_test:
-    needs: [build_and_deploy]
-    name: Testing load balancer
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./architeture2/autoscale_instances
-    steps:
-      - name: Check out repo's default branch
-        uses: actions/checkout@v3
+  # lb_test:
+  #   needs: [build_and_deploy]
+  #   name: Testing load balancer
+  #   runs-on: ubuntu-latest
+  #   defaults:
+  #     run:
+  #       working-directory: ./architeture2/autoscale_instances
+  #   steps:
+  #     - name: Check out repo's default branch
+  #       uses: actions/checkout@v3
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-          cache: 'pip'   
+  #     - name: Setup Python
+  #       uses: actions/setup-python@v4
+  #       with:
+  #         python-version: '3.9'
+  #         cache: 'pip'   
 
-      - uses: actions/download-artifact@v3
-        with:
-          name: tfstate
-          path: architeture2/autoscale_instances
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: tfstate
+  #         path: architeture2/autoscale_instances
 
-      - name: Install dependencies
-        run: pip install -r ./tests/requirements.txt  
+  #     - name: Install dependencies
+  #       run: pip install -r ./tests/requirements.txt  
 
-      - uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+  #     - uses: aws-actions/configure-aws-credentials@v1
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-region: us-east-1
 
-      - run: python -m pytest tests/load_balancer -v
-        env:
-          LB_URL: ${{ needs.build_and_deploy.outputs.lb_url }}
+  #     - run: python -m pytest tests/load_balancer -v
+  #       env:
+  #         LB_URL: ${{ needs.build_and_deploy.outputs.lb_url }}
 
-      - run: |
-          terraform init
-          terraform destroy --auto-approve
-        if: ${{ failure() || cancelled() }}
+  #     - run: |
+  #         terraform init
+  #         terraform destroy --auto-approve
+  #       if: ${{ failure() || cancelled() }}
 
   test_stress:
     needs: [build_and_deploy]

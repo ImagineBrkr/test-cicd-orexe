@@ -40,8 +40,8 @@ def get_ssh_key(scope='session'):
     f = open("customkey.pem", "w")
     f.write(key)
     f.close()
-    subprocess.call('ls')
-    subprocess.call('chmod 400 customkey.pem')    
+    subprocess.call('cat customkey.pem', shell = True)
+    subprocess.call('chmod 400 customkey.pem', shell = True)    
 
 def test_scale(get_ssh_key):
         
@@ -68,7 +68,7 @@ def test_scale(get_ssh_key):
             num_tries += 1
             if num_tries == 5:
                 raise Exception("No instances detected")
-            time.sleep(30)
+            time.sleep(0)
             auto_scaling_instances = get_auto_scaling_instances()
             num_instances = len(auto_scaling_instances)           
 
@@ -107,7 +107,7 @@ def test_ansible(get_ssh_key):
             num_tries += 1
             if num_tries == 5:
                 raise Exception("No instances detected")
-            time.sleep(30)
+            time.sleep(0)
             auto_scaling_instances = get_auto_scaling_instances()
             num_instances = len(auto_scaling_instances)   
         try:

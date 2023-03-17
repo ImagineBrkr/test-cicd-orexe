@@ -1,5 +1,5 @@
-name: Deploying lambda function
-run-name: Deploying lambda function
+name: Sending guardduty notifications to sns
+run-name: Sending guardduty notifications to sns
 
 on:
   # push:
