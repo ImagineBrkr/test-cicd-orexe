@@ -95,7 +95,7 @@ resource "aws_cloudwatch_event_rule" "mock_guardduty_data" {
   name        = "mock_guardduty_data"
   description = "Sending mock GuardDuty data"
 
-  schedule_expression = "rate(2 minutes)"
+  schedule_expression = "rate(30 minutes)"
   #event_bus_name = default
   is_enabled = true
 }
@@ -158,7 +158,7 @@ resource "aws_lambda_function" "mock_data_function" {
 
 //IAM Role policy for lambda function
 resource "aws_iam_role" "iam_for_lambda" {
-  name = "iam_for_lambda_usage"
+  name = "iam_for_lambda_guardduty"
 
   assume_role_policy = <<EOF
     {
@@ -180,7 +180,7 @@ resource "aws_iam_role" "iam_for_lambda" {
 
 //Giving permission for invoking lambda function
 resource "aws_lambda_permission" "api_gw" {
-  statement_id  = "AllowExecutionFromCloudWatch"
+  statement_id  = "AllowExecutionFromCloudWatchGuardDuty"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.mock_data_function.function_name
   principal     = "events.amazonaws.com"
