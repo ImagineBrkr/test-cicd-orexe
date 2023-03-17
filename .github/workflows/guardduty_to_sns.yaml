@@ -2,9 +2,9 @@ name: Sending guardduty notifications to sns
 run-name: Sending guardduty notifications to sns
 
 on:
-  push:
-    branches:
-      - "main"
+  # push:
+  #   branches:
+  #     - "main"
   workflow_dispatch:
 
 jobs:

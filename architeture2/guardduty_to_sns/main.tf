@@ -156,14 +156,6 @@ resource "aws_lambda_function" "mock_data_function" {
     # ]
 }
 
-# resource "null_resource" "build_lambda_function" {
-
-#     provisioner "local-exec" {
-#         command =  "powershell.exe -File .\\PyBuild.ps1 ${local.lambda_src_path} ${local.building_path} ${local.lambda_code_filename} Function"
-#     }
-# }
-
-
 //IAM Role policy for lambda function
 resource "aws_iam_role" "iam_for_lambda" {
   name = "iam_for_lambda_usage"

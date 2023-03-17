@@ -29,8 +29,8 @@ def getInstanceConnect(InstanceId):
     connect = "ssh -o StrictHostKeyChecking=no -i \"%s.pem\" %s" % (instance['KeyName'], getNameConnect(InstanceId))
     return connect
 
-@pytest.fixture
-def get_ssh_key(scope='session'):
+@pytest.fixture(scope='session')
+def get_ssh_key():
     secrets_client = boto3.client(service_name='secretsmanager')
     get_secret_value_response = secrets_client.get_secret_value(
             SecretId='keypair_customkey'
@@ -40,7 +40,7 @@ def get_ssh_key(scope='session'):
     f = open("customkey.pem", "w")
     f.write(key)
     f.close()
-    subprocess.call('cat customkey.pem', shell = True)
+    # subprocess.call('cat customkey.pem', shell = True)
     subprocess.call('chmod 400 customkey.pem', shell = True)    
 
 def test_scale(get_ssh_key):
@@ -68,7 +68,7 @@ def test_scale(get_ssh_key):
             num_tries += 1
             if num_tries == 5:
                 raise Exception("No instances detected")
-            time.sleep(0)
+            time.sleep(30)
             auto_scaling_instances = get_auto_scaling_instances()
             num_instances = len(auto_scaling_instances)           
 
