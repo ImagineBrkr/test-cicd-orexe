@@ -13,7 +13,6 @@ jobs:
   #   runs-on: ubuntu-latest
       
   build_and_deploy:
-    needs: [unit_test]
     name: Building and deploying
     runs-on: ubuntu-latest
     defaults:
