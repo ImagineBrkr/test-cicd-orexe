@@ -2,9 +2,9 @@ name: Auto scaling instances
 run-name: Auto scaling instances
 
 on:
-  push:
-    branches:
-      - "main"
+  # push:
+  #   branches:
+  #     - "main"
   workflow_dispatch:
 
 jobs:
@@ -47,11 +47,11 @@ jobs:
           echo "lb_url=$lb_url" >> $GITHUB_OUTPUT
         id: get_lb_url
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: key
-          path: architeture2/autoscale_instances/customkey.pem
-          if-no-files-found: error
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: key
+      #     path: architeture2/autoscale_instances/customkey.pem
+      #     if-no-files-found: error
 
       - uses: actions/upload-artifact@v3
         with:
@@ -124,10 +124,10 @@ jobs:
       - name: Install dependencies
         run: pip install -r ./tests/requirements.txt  
 
-      - uses: actions/download-artifact@v3
-        with:
-          name: key
-          path: architeture2/autoscale_instances
+      # - uses: actions/download-artifact@v3
+      #   with:
+      #     name: key
+      #     path: architeture2/autoscale_instances
 
       - uses: actions/download-artifact@v3
         with:
@@ -141,10 +141,6 @@ jobs:
           aws-region: us-east-1
 
       - run: |
-          ls -lha
-          cat customkey.pem
-          sudo chmod 400 customkey.pem
-          ls -lha
           python -m pytest tests/auto_scale/test.py          
 
       - run: |

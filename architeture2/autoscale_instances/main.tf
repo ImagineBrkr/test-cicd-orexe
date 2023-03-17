@@ -90,12 +90,22 @@ resource "aws_key_pair" "customkey" {
   key_name          = "customkey"
   public_key        = tls_private_key.rsa.public_key_openssh
 }
+
+
 resource "local_file" "customkeypair" {
   filename          = "customkey.pem"
   content           = tls_private_key.rsa.private_key_pem
   file_permission   = "0400"
 }
 
+resource "aws_secretsmanager_secret" "customkey" {
+  name = "keypair_customkey"
+}
+
+resource "aws_secretsmanager_secret_version" "example" {
+  secret_id     = aws_secretsmanager_secret.customkey.id
+  secret_string = tls_private_key.rsa.private_key_pem
+}
 #Application load balancer
 resource "aws_lb" "hellolb" {
   name               = "MyHelloLB"

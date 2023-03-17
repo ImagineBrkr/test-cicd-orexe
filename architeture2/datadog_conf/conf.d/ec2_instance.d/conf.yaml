@@ -1,0 +1,7 @@
+logs:
+  - type: file
+    path: /var/log/*.log
+    service: EC2_INSTANCE
+    source: EC2
+    exclude_paths:
+      - /var/log/auth.log

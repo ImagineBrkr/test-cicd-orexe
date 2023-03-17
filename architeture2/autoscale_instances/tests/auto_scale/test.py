@@ -29,7 +29,19 @@ def getInstanceConnect(InstanceId):
     connect = "ssh -o StrictHostKeyChecking=no -i \"%s.pem\" %s" % (instance['KeyName'], getNameConnect(InstanceId))
     return connect
 
-def test_scale():
+@pytest.fixture
+def get_ssh_key():
+    secrets_client = boto3.client(service_name='secretsmanager')
+    get_secret_value_response = secrets_client.get_secret_value(
+            SecretId='keypair_customkey'
+        )
+    key = get_secret_value_response['SecretString']
+    f = open("customkey.pem", "w")
+    f.write(key)
+    subprocess.call('chmod 400 customkey.pem')
+    f.close()
+
+def test_scale(get_ssh_key):
         
         ec2_client = boto3.client('ec2')
         auto_scaling_instances = []
@@ -61,17 +73,17 @@ def test_scale():
         for i in auto_scaling_instances:
             subprocess.call(getInstanceConnect(i) + ' \"sudo stress --cpu 1500 --timeout 180 \"', shell = True)
 
-        time.sleep(30)
-        for i in range(8):
+        time.sleep(10)
+        for i in range(2):
             
             if num_instances < len(auto_scaling_instances):
                 break
-            time.sleep(30)
+            time.sleep(10)
             auto_scaling_instances = get_auto_scaling_instances()
 
         assert num_instances < len(auto_scaling_instances)
 
-def test_ansible():
+def test_ansible(get_ssh_key):
         ec2_client = boto3.client('ec2')
         auto_scaling_instances = []
         def get_auto_scaling_instances():
