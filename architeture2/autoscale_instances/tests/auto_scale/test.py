@@ -107,7 +107,7 @@ def test_ansible(get_ssh_key):
             num_tries += 1
             if num_tries == 5:
                 raise Exception("No instances detected")
-            time.sleep(0)
+            time.sleep(30)
             auto_scaling_instances = get_auto_scaling_instances()
             num_instances = len(auto_scaling_instances)   
         try:
