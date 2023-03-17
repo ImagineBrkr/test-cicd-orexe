@@ -87,7 +87,7 @@ data "aws_iam_policy_document" "sns_topic_policy" {
 resource "aws_sns_topic_subscription" "send_email_guardduty" {
   topic_arn = aws_sns_topic.aws_guardduty_detected_event.arn
   protocol  = "email"
-  endpoint  = "salvattore_25@hotmail.com"
+  endpoint  = "notificaciones.salvattore@gmail.com"
 }
 
 #Sending fake data

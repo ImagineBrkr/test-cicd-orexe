@@ -42,7 +42,7 @@ def get_ssh_key():
     f.close()
     # subprocess.call('cat customkey.pem', shell = True)
     subprocess.call('chmod 400 customkey.pem', shell = True)    
-
+        
 def test_scale(get_ssh_key):
         
         ec2_client = boto3.client('ec2')
@@ -75,7 +75,7 @@ def test_scale(get_ssh_key):
         for i in auto_scaling_instances:
             subprocess.Popen(getInstanceConnect(i) + ' \"sudo stress --cpu 1500 --timeout 180 \"', shell = True)
 
-        time.sleep(300) #Usually it takes this time
+        time.sleep(270) #It usually takes this time
         for i in range(16):
             
             if num_instances < len(auto_scaling_instances):
@@ -110,8 +110,13 @@ def test_ansible(get_ssh_key):
             time.sleep(30)
             auto_scaling_instances = get_auto_scaling_instances()
             num_instances = len(auto_scaling_instances)   
-        subprocess.call('cat customkey.pem', shell = True)
-        try:
-            result = subprocess.check_output(getInstanceConnect(auto_scaling_instances[0]) + ' \"ansible --version\"', shell = True)
-        except CalledProcessError:
-            raise Exception("Ansible not found")
+        count_tests = 0
+        for i in range(num_instances):        
+            try:
+                result = subprocess.check_output(getInstanceConnect(auto_scaling_instances[i]) + ' \"ansible --version\"', shell = True)
+                break
+            except CalledProcessError:
+                count_tests += 1
+
+        assert count_tests < num_instances
+
