@@ -73,14 +73,14 @@ def test_scale(get_ssh_key):
             num_instances = len(auto_scaling_instances)           
 
         for i in auto_scaling_instances:
-            subprocess.call(getInstanceConnect(i) + ' \"sudo stress --cpu 1500 --timeout 180 \"', shell = True)
+            subprocess.Popen(getInstanceConnect(i) + ' \"sudo stress --cpu 1500 --timeout 180 \"', shell = True)
 
-        time.sleep(10)
-        for i in range(2):
+        time.sleep(300) #Usually it takes this time
+        for i in range(16):
             
             if num_instances < len(auto_scaling_instances):
                 break
-            time.sleep(10)
+            time.sleep(15)
             auto_scaling_instances = get_auto_scaling_instances()
 
         assert num_instances < len(auto_scaling_instances)
