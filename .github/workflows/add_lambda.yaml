@@ -2,9 +2,9 @@ name: Deploying lambda function
 run-name: Deploying lambda function
 
 on:
-  push:
-    branches:
-      - "main"
+  # push:
+  #   branches:
+  #     - "main"
   workflow_dispatch:
 
 jobs:
@@ -73,8 +73,16 @@ jobs:
       - run: terraform plan -var="TF_VAR_default_name=$TF_VAR_default_name"
       - run: terraform apply -auto-approve -var="TF_VAR_default_name=$TF_VAR_default_name"
 
-      - run: terraform destroy -auto-approve
+      - run: |
+          sleep 5s
+          terraform destroy -auto-approve
         if: ${{ failure() || cancelled() }}
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: tfstate_lambda
+          path: architeture2/add_lambda/terraform.tfstate
+          if-no-files-found: error   
 
       - id: get_api_url
         run: |
@@ -93,6 +101,11 @@ jobs:
       - name: Check out repo's default branch
         uses: actions/checkout@v3
 
+      - uses: actions/download-artifact@v3
+        with:
+          name: tfstate_lambda
+          path: architeture2/autoscale_instances
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -108,6 +121,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - run: python -m pytest tests/load_balancer -v
+      - run: python -m pytest tests/integration -v
         env:
           API_URL: ${{ needs.build_and_deploy.outputs.api_url }}
+
+      - run: |
+          terraform init
+          terraform destroy --auto-approve
+        if: ${{ failure() || cancelled() }}
+

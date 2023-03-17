@@ -110,6 +110,7 @@ def test_ansible(get_ssh_key):
             time.sleep(30)
             auto_scaling_instances = get_auto_scaling_instances()
             num_instances = len(auto_scaling_instances)   
+        subprocess.call('cat customkey.pem', shell = True)
         try:
             result = subprocess.check_output(getInstanceConnect(auto_scaling_instances[0]) + ' \"ansible --version\"', shell = True)
         except CalledProcessError:
