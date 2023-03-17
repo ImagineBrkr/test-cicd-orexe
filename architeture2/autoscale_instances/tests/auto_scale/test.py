@@ -30,16 +30,18 @@ def getInstanceConnect(InstanceId):
     return connect
 
 @pytest.fixture
-def get_ssh_key():
+def get_ssh_key(scope='session'):
     secrets_client = boto3.client(service_name='secretsmanager')
     get_secret_value_response = secrets_client.get_secret_value(
             SecretId='keypair_customkey'
         )
     key = get_secret_value_response['SecretString']
+    print(key)
     f = open("customkey.pem", "w")
     f.write(key)
-    subprocess.call('chmod 400 customkey.pem')
     f.close()
+    subprocess.call('ls')
+    subprocess.call('chmod 400 customkey.pem')    
 
 def test_scale(get_ssh_key):
         

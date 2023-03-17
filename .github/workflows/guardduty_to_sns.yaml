@@ -38,7 +38,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - run: bash ../.github/scripts/py_build.sh $GITHUB_WORKSPACE/architeture2/guardduty_to_sns/lambda_function $GITHUB_WORKSPACE/architeture2/guardduty_to_sns/build lambda_mock.zip Function   
+      - run: bash $GITHUB_WORKSPACE/.github/scripts/py_build.sh $GITHUB_WORKSPACE/architeture2/guardduty_to_sns/lambda_function $GITHUB_WORKSPACE/architeture2/guardduty_to_sns/build lambda_mock.zip Function   
       - run: terraform init
       - run: terraform plan
       - run: terraform apply -auto-approve
