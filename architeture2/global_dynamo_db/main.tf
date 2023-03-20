@@ -4,7 +4,18 @@ data "aws_region" "alternate" {
   name = "us-west-2"
 }
 
+provider "aws" {
+  alias  = "main"
+  region = "us-east-1"
+}
+
+provider "aws" {
+    alias = "alternate"
+    region = "us-west-2"
+}
+
 resource "aws_dynamodb_table" "clients_table" {
+  provider = "aws.main"
   name           = "Clients"
   billing_mode   = "PROVISIONED"
   hash_key       = "ClientId"
@@ -102,5 +113,5 @@ resource "aws_dynamodb_table_replica" "table_replica" {
   ]
   global_table_arn = aws_dynamodb_table.clients_table.arn
 
-  region = data.aws_region.alternate.name
+  provider = "aws.alt"
 }
