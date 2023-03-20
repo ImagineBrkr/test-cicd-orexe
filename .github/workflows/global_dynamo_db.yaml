@@ -37,7 +37,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: tfstate
-          path: architeture2/autoscale_instances/terraform.tfstate
+          path: architeture2/global_dynamo_db/terraform.tfstate
           if-no-files-found: error           
 
       - run: |
