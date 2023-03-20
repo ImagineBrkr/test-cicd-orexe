@@ -185,7 +185,7 @@ resource "aws_autoscaling_group" "autoscale_group" {
   force_delete              = true
 # Defining the termination policy where the oldest instance will be replaced first 
   termination_policies      = ["OldestInstance"]
-# Scaling group is dependent on autoscaling launch configuration because of AWS EC2 instance configurations
+# Scaling group is dependent on launch templates
   launch_template       {
     id = aws_launch_template.aws_autoscale_conf.id
     version = "$Latest"
