@@ -15,7 +15,7 @@ provider "aws" {
 }
 
 resource "aws_dynamodb_table" "clients_table" {
-  provider = "aws.main"
+  provider = aws.main
   name           = "Clients"
   billing_mode   = "PROVISIONED"
   hash_key       = "ClientId"
@@ -113,5 +113,5 @@ resource "aws_dynamodb_table_replica" "table_replica" {
   ]
   global_table_arn = aws_dynamodb_table.clients_table.arn
 
-  provider = "aws.alt"
+  provider = aws.alternate
 }
