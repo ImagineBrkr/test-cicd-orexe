@@ -2,9 +2,9 @@ name: Sending guardduty notifications to sns
 run-name: Sending guardduty notifications to sns
 
 on:
-  push:
-    branches:
-      - "main"
+  # push:
+  #   branches:
+  #     - "main"
   workflow_dispatch:
 
 jobs:
@@ -45,7 +45,7 @@ jobs:
 
       - run: terraform destroy -auto-approve
         if: ${{ failure() || cancelled() }}
-        
+
       - uses: actions/upload-artifact@v3
         if: ${{ success() || failure() }}
         with:

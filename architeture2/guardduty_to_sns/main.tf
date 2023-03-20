@@ -1,19 +1,19 @@
-# resource "aws_guardduty_detector" "new_detector" {
-#   enable = true
+resource "aws_guardduty_detector" "new_detector" {
+  enable = true
 
-#   datasources {
-#     s3_logs {
-#       enable = true
-#     }
-#     malware_protection {
-#       scan_ec2_instance_with_findings {
-#         ebs_volumes {
-#           enable = true
-#         }
-#       }
-#     }
-#   }
-# }
+  datasources {
+    s3_logs {
+      enable = true
+    }
+    malware_protection {
+      scan_ec2_instance_with_findings {
+        ebs_volumes {
+          enable = true
+        }
+      }
+    }
+  }
+}
 
 resource "aws_cloudwatch_event_bus" "guardduty_event_bus" {
   name = "guardduty_event_bus"
