@@ -2,9 +2,9 @@ name: Auto scaling instances
 run-name: Auto scaling instances
 
 on:
-  # push:
-  #   branches:
-  #     - "main"
+  push:
+    branches:
+      - "main"
   workflow_dispatch:
 
 jobs:
