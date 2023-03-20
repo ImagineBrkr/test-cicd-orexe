@@ -12,6 +12,11 @@ resource "aws_dynamodb_table" "clients_table" {
   read_capacity = 1
   write_capacity = 1
   deletion_protection_enabled = false
+  lifecycle {
+    ignore_changes = [
+      read_capacity, write_capacity
+    ]
+  }
 
   attribute {
     name = "ClientId"
@@ -32,18 +37,12 @@ resource "aws_dynamodb_table" "clients_table" {
     Name        = "dynamodb_table"
     Environment = "production"
   }
-
-  replica {
-    region_name = data.aws_region.alternate.name
-  }
-
-
 }
 
 resource "aws_appautoscaling_target" "dynamodb_table_read_target" {
   max_capacity       = 10
   min_capacity       = 1
-  resource_id        = "table/Clients"
+  resource_id        = "table/${aws_dynamodb_table.clients_table.name}"
   scalable_dimension = "dynamodb:table:ReadCapacityUnits"
   service_namespace  = "dynamodb"
 
@@ -69,7 +68,7 @@ resource "aws_appautoscaling_policy" "dynamodb_table_read_policy" {
 resource "aws_appautoscaling_target" "dynamodb_table_write_target" {
   max_capacity       = 10
   min_capacity       = 1
-  resource_id        = "table/Clients"
+  resource_id        = "table/${aws_dynamodb_table.clients_table.name}"
   scalable_dimension = "dynamodb:table:WriteCapacityUnits"
   service_namespace  = "dynamodb"
 
@@ -89,4 +88,19 @@ resource "aws_appautoscaling_policy" "dynamodb_table_write_policy" {
 
     target_value = 70
   }
+}
+
+resource "aws_dynamodb_replica_tables" "example_replica" {
+  # We use depends_on and reference back to the original table ARN to ensure
+  # that this resource will be create only after the original table, plus its
+  # auto-scaling rules, have already been created
+  depends_on = [
+    aws_appautoscaling_target.dynamodb_table_read_target,
+    aws_appautoscaling_policy.dynamodb_table_read_policy,
+    aws_appautoscaling_target.dynamodb_table_write_target,
+    aws_appautoscaling_policy.dynamodb_table_write_policy,
+  ]
+  original_table_arn = aws_dynamodb_table.clients_table.arn
+
+  region = data.aws_region.alternate.name
 }
